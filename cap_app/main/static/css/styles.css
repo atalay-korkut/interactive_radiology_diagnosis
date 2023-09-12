@@ -1,0 +1,97 @@
+body {
+  background-color: #add8e6;
+}
+.input-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.input-container label {
+  margin-bottom: 5px;
+}
+h1 {
+  text-align: center;
+}
+#container-everything {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid black;
+  flex-direction: column;
+  background-color: blanchedalmond;
+  gap: 10px;
+  max-width: 1400px;
+  margin: 0 auto; /* optional: to center the container horizontally */
+}
+
+#container-forms {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background-color: blanchedalmond;
+  margin-top: 5px;
+}
+#container-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  gap: 10px;
+  margin-top: 10px;
+  background-color: blanchedalmond;
+}
+#newQueryButton {
+  margin-bottom: 10px;
+}
+#statsDiv {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background-color: white;
+  margin-top: 5px;
+  border: 1px solid black;
+  border-radius: 2px;
+  max-width: 400px;
+}
+#statsDiv:empty {
+  border: none;
+}
+strong {
+  display:inline !important;
+  margin: 0;
+  padding: 0;
+}
+/* static/css/loading_spinner.css */
+.loading-container {
+  position: relative;
+}
+
+.loading-spinner {
+  display: none; /* Initially hide the spinner */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.spinner {
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top: 4px solid #3498db;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

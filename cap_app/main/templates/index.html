@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Interactive Radiology Report Generation</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/css/bootstrap.min.css"
+      integrity="sha512-SbiR/eusphKoMVVXysTKG/7VseWii+Y3FdHrt0EpKgpToZeemhqHeZeLWLhJutz/2ut2Vw1uQEj2MbRF+TVBUA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+    <link rel="icon" type="image/x-icon" href="{% static 'images/lungs.ico' %}">
+  </head>
+  <body>
+    <h1>Interactive Radiology Report Generation</h1>
+    <div id="container-everything">
+      <div id="container-forms">
+        <!--form to upload image-->
+        <form lang="en" method="post" enctype="multipart/form-data">
+          {% csrf_token %} {{ form.as_p }}
+          <button type="submit" class="btn btn-primary">Upload</button>
+        </form>
+
+        {% if img_obj %}
+        <h3>Succesfully uploaded: {{img_obj.title}}</h3>
+        <img
+          src="{{ img_obj.image.url}}"
+          alt="connect"
+          style="max-height: 300px"
+        />
+        {% endif %}
+        <div id="container-buttons">
+          <form id="modelForm">
+            <input
+              type="submit"
+              class="btn btn-primary"
+              value="Load Model"
+              name="mybtn4"
+            />
+          </form>
+
+          <form id="statsForm">
+            <input
+              type="submit"
+              class="btn btn-primary"
+              value="Stats"
+              name="mybtn2"
+            />
+          </form>
+
+          <form id="generateForm">
+            <input
+              type="submit"
+              class="btn btn-primary"
+              value="Generate"
+              name="mybtn"
+            />
+          </form>
+
+          <form id="commentForm">
+            <input
+              type="submit"
+              class="btn btn-primary"
+              value="Send Comment"
+              name="mybtn3"
+            />
+          </form>
+        </div>
+        <!-- end of container-buttons -->
+      </div>
+      <!-- end of container-forms -->
+
+      <div class="input-container"><!-- templates/loading_spinner.html -->
+        <div class="loading-spinner">
+          <!-- Add your spinner HTML/CSS here -->
+          <div class="spinner"></div>
+        </div>
+        
+        <label for="inputTextarea">Add Comment</label>
+        <textarea
+          id="inputTextarea"
+          rows="8"
+          cols="50"
+          name="input_text"
+        ></textarea>
+      </div>
+
+      <div class="input-container">
+        <label for="statsTextarea">Stats</label>
+        <!--<textarea id="statsTextarea" rows="8" cols="50"></textarea>-->
+        <div id="statsDiv" ></div>
+      </div>
+      <div id="newQueryButton">
+        <form action="http://localhost:8000/upload/">
+          <button type="submit" class="btn btn-primary">New Query</button>
+        </form>
+      </div>
+    </div>
+    <!-- end of container-everything -->
+
+    <!-- javascript code to generate AI output-->
+    <script>
+      // static/js/loading_spinner.js
+function showLoadingSpinner() {
+  document.querySelector('.loading-spinner').style.display = 'block';
+}
+
+function hideLoadingSpinner() {
+  document.querySelector('.loading-spinner').style.display = 'none';
+}
+
+      document
+        .getElementById("generateForm")
+        .addEventListener("submit", function (event) {
+          event.preventDefault(); // Prevent the default form submission behavior
+          showLoadingSpinner();
+          // Make a fetch request to your Django view
+          fetch("/generate/", { method: "GET" })
+            .then(function (response) {
+              hideLoadingSpinner();
+              return response.json();
+            })
+            .then(function (data) {
+              // document.getElementById('outputTextarea').value = data['AIoutput'];
+              document.getElementById("inputTextarea").value = data["AIoutput"];
+            })
+            .catch(function (error) {
+              console.log(error);
+            });
+        });
+    </script>
+
+    <!-- javascript code to load statistics-->
+    <script>
+      document
+        .getElementById("statsForm")
+        .addEventListener("submit", function (event) {
+          event.preventDefault(); // Prevent the default form submission behavior
+
+          // Make a fetch request to your Django view using GET method
+          fetch("/stats/", { method: "GET" })
+            .then(function (response) {
+              return response.json();
+            })
+            .then(function (data) {
+              // Display the last entry in the database in the inputTextarea
+             
+              console.log(data);
+
+              var outputText = data["outputText"];
+              var userInput = data["userInput"];
+              var formattedOutput = outputText;
+              
+
+              userInput.forEach(function (element) {
+                var blueElement = '<span style="color: blue; white-space: nowrap;">' + element + '</span>';
+                formattedOutput = formattedOutput.replace(element, blueElement);
+              });
+              formattedOutput = formattedOutput.replace(/\n/g, '');
+        document.getElementById("statsDiv").innerHTML =
+          "Statistics for Image: " +
+          data["title"] +"<br>"+ "Generated Report: " + data["clicks"] + " times" +
+          "<br>" +
+          "<strong>REPORT:</strong> " +
+          formattedOutput + // Use the formatted output
+          "<br>" +
+          "Upload Date: " +
+          data["createdAt"]
+
+              console.log(data["last_entry"]);
+            })
+            .catch(function (error) {
+              console.log(error);
+            });
+        });
+    </script>
+    <dialog id="modelLoadedDialog">
+      <p>Model has been successfully loaded!</p>
+      <button id="closeDialogButton">Close</button>
+    </dialog>
+
+    <dialog id="modelLoadedDialog">
+      <p>Model has been successfully loaded!</p>
+      <button id="closeDialogButton">Close</button>
+    </dialog>
+
+    <!-- javascript code to load model and notify user with a popup-->
+    <script>
+      document
+        .getElementById("modelForm")
+        .addEventListener("submit", function (event) {
+          event.preventDefault(); // Prevent the default form submission behavior
+
+          fetch("/load_model/", { method: "GET" })
+            .then(function (response) {
+              return response.json(); // Parse the response as JSON
+            })
+            .then(function (data) {
+              console.log("Response from server:", data);
+              if (data.status === "success") {
+                const dialog = document.getElementById("modelLoadedDialog");
+                dialog.showModal(); // Show the dialog popup
+
+                const closeButton =
+                  document.getElementById("closeDialogButton");
+                closeButton.addEventListener("click", function () {
+                  dialog.close(); // Close the dialog when the button is clicked
+                });
+              }
+            })
+            .catch(function (error) {
+              console.error("Error:", error);
+              // Handle errors that might occur during the fetch request
+            });
+        });
+    </script>
+
+    <!-- javascript code to sent comment-->
+    <script>
+      document
+        .getElementById("commentForm")
+        .addEventListener("submit", function (event) {
+          event.preventDefault(); // Prevent the default form submission behavior
+
+          const inputText = document.getElementById("inputTextarea").value;
+          console.log(inputText);
+
+          // Make a fetch request to your Django view using POST method
+          fetch("/comment/", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": "{{ csrf_token }}", // Add the CSRF token to headers
+            },
+            body: JSON.stringify({ input_text: inputText }),
+          })
+            .then(function (response) {
+              return response.json();
+            })
+            .then(function (data) {
+              if (data.status === "success") {
+                console.log(body);
+                // alert('Data saved to database successfully!');
+              } else {
+                // alert('Error saving data to database.');
+              }
+            })
+            .catch(function (error) {
+              console.log(error);
+            });
+        });
+    </script>
+
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/js/bootstrap.min.js"
+      integrity="sha512-1/RvZTcCDEUjY/CypiMz+iqqtaoQfAITmNSJY17Myp4Ms5mdxPS5UV7iOfdZoxcGhzFbOm6sntTKJppjvuhg4g=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+  </body>
+</html>
