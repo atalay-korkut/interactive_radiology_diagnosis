@@ -1,4 +1,4 @@
-# CAP_radiology_reporting_website
+# Interactive Radiology Diagnosis
 
 A web interface for the RATCHET medical report generation model. <br>
 RATCHET: https://github.com/farrell236/RATCHET
