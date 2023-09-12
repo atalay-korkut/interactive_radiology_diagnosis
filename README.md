@@ -1,7 +1,7 @@
 # CAP_radiology_reporting_website
 
-A web interface for the RATCHET medical report generation model.
-
+A web interface for the RATCHET medical report generation model. <br>
+RATCHET: https://github.com/farrell236/RATCHET/tree/master
 ### Usage
 
 Download pretrained weights and put in `./checkpoints` folder.
@@ -11,7 +11,7 @@ Download pretrained weights and put in `./checkpoints` folder.
 
 Start django server to run the webapp:
 
-"python manage.py runserver" in \cap_radiology_reporting_website\cap_app
+"python manage.py runserver" in \interactive_radiology_diagnosis\cap_app
 
 Choose a chest x-ray image to upload with a title and click upload.
 
