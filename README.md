@@ -1,7 +1,7 @@
 # CAP_radiology_reporting_website
 
 A web interface for the RATCHET medical report generation model. <br>
-RATCHET: https://github.com/farrell236/RATCHET/tree/master
+RATCHET: https://github.com/farrell236/RATCHET
 ### Usage
 
 Download pretrained weights and put in `./checkpoints` folder.
